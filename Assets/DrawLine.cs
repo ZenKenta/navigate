@@ -9,45 +9,90 @@ public class DrawLine : MonoBehaviour {
     public Vector3 secondPosition = new Vector3(0.0f, 0.0f, 1.0f);
 
     private LineRenderer lr;
+    private CourseData Data;
 
     // Use this for initialization
     void Start()
     {
-        lr = GameObject.Find("Line").GetComponent<LineRenderer>();
-        lr.enabled =false;
-    }
 
-    // Update is called once per frame
-    // void Update()
-    // {
-    //     if (OnTouchDown())
-    //     {
-    //         Debug.Log("タップされました");
-    //     }
-    // }
+    }
 
     void Update()
     {
+        //マウス操作での確認処理
+        MouseDown();
+
+        //スマホ操作
+        //OnTouchDown();
+
+    }
+
+
+
+    public void DataLoad()
+    {
+        lr = GameObject.Find("Line").GetComponent<LineRenderer>();
+        //lr.enabled =false;
+        Data = new CourseData();
+        Data.Load();
+
+        lr.positionCount = Data.positions.Length;
+        lr.SetPositions(Data.positions);
+
+        if (Data.positions.Length < 2)
+        {
+            lr.enabled = false;
+        }
+        else
+        {
+            lr.enabled = true;
+        }
+    }
+    //マウス向け
+    void MouseDown()
+    {
         if (Input.GetMouseButton(0))
         {
-            Draw();
+            if (Input.mousePosition.x > 150)
+            {
+                Vector2 Position = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                Draw(Position);
+            }
+        }        
+    }
+    //スマホ向け そのオブジェクトがタッチされていたらtrue（マルチタップ対応）
+    void OnTouchDown()
+    {
+        // タッチされているとき
+        if (0 < Input.touchCount)
+        {
+            // タッチされている指の数だけ処理
+            for (int i = 0; i < Input.touchCount; i++)
+            {
+                // タッチ情報をコピー
+                Touch t = Input.GetTouch(i);
+                // タッチしたときかどうか
+                if (t.phase == TouchPhase.Began)
+                {
+                    if (t.position.x > 150)
+                    {
+                        Draw(Camera.main.ScreenToWorldPoint(t.position));
+                    }
+                 }
+            }
         }
     }
 
-    void Draw()
+    void Draw(Vector2 Position)
     {
         lr = GameObject.Find("Line").GetComponent<LineRenderer>();
         lr.material = new Material(Shader.Find("Sprites/Default"));
-        Vector2 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-
         //debug用
-        //print(lr.positionCount);
-        //print(lr.GetPosition(0) + "+"+lr.GetPosition(1));
+        //print(lr.positionCount+":"+lr.GetPosition(0) + ","+lr.GetPosition(1));
 
         // 座標の格納可能数を更新する
+        Vector3 lineRendererPosition = new Vector3(Position.x, Position.y, -1.0f);
 
-        Vector3 lineRendererPosition = new Vector3(mousePosition.x, mousePosition.y, -1.0f);
-        Vector3 LastPosition = lr.GetPosition(lr.positionCount - 1);
         // print(LastPosition);
         if (lr.GetPosition(0) == startPosition)
         {
@@ -96,28 +141,6 @@ public class DrawLine : MonoBehaviour {
 
         lr.positionCount = lr.positionCount - 1;
         lr.SetPositions(positions);
-    }
-
-
-    //スマホ向け そのオブジェクトがタッチされていたらtrue（マルチタップ対応）
-    bool OnTouchDown()
-    {
-        // タッチされているとき
-        if (0 < Input.touchCount)
-        {
-            // タッチされている指の数だけ処理
-            for (int i = 0; i < Input.touchCount; i++)
-            {
-                // タッチ情報をコピー
-                Touch t = Input.GetTouch(i);
-                // タッチしたときかどうか
-                if (t.phase == TouchPhase.Began)
-                {
-                    GameObject.Find("PlaceText").GetComponent<Text>().text = "ttest";
-                }
-            }
-        }
-        return false; //タッチされてなかったらfalse
     }
 
 }

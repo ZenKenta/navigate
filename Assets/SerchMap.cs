@@ -10,8 +10,8 @@ public class SerchMap : MonoBehaviour {
     GeoLocation calculator;
     Text Place;
 
-    private int width = 2000;
-    private int height =2000;
+    private int width = 1000;
+    private int height =1000;
 
     private double longitude;
     private double latitude;
@@ -36,7 +36,6 @@ public class SerchMap : MonoBehaviour {
         Place = GameObject.Find("PlaceText").GetComponent<Text>();
 
         print(GeoURL+ Place.text);
-        //WWW www = new WWW(GeoURL + "下作延４－２２－３１");
         WWW www = new WWW(GeoURL + Place.text);
         yield return www;
         if (www.error == null)
@@ -75,12 +74,14 @@ public class SerchMap : MonoBehaviour {
             print("Location: " + latitude + " " + longitude + " " + Input.location.lastData.altitude + " " + Input.location.lastData.horizontalAccuracy + " " + Input.location.lastData.timestamp);
             //drawer.Geo = new GeoLocation(latitude, longitude);
             //	string url = "http://maps.googleapis.com/maps/api/streetview?" + "size=" + width + "x" + height + "&location=" + latitude + "," + longitude + "&heading=" + heading + "&pitch=" + pitch + "&fov=90&sensor=false";
-            string url = "http://maps.googleapis.com/maps/api/staticmap?center=" + latitude + "," + longitude + "&zoom=" + 17 + "&size=" + width + "x" + height ;
+            string url = "http://maps.googleapis.com/maps/api/staticmap?center=" + latitude + "," + longitude + "&zoom=" + 17 + "&size=" + width + "x" + height;
 
             www = new WWW(url);
             yield return www;
 
             GameObject.Find("Map").GetComponent<Renderer>().material.mainTexture = www.texture;
+            GameObject.Find("Ido").GetComponent<Text>().text = latitude.ToString();
+            GameObject.Find("Keido").GetComponent<Text>().text = longitude.ToString();
         }
         else
         {
